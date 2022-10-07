@@ -1,0 +1,9 @@
+autocorrect other people's comments
+delete all subreddit only comments
+show post content
+browse subreddit
+tag usernames with the bad subreddits they belong to, or remove them entirely
+
+user settings:
+hide comments from users that participate in bad subreddits { All, CommentPolicy(SubredditPolicy(string subreddit, FilterAction filterAction)) }
+hide posts from users that participate in bad subreddits

@@ -6,8 +6,11 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+async-recursion = "1.0.0"
 colored = "2.0.0"
+enum-map = "2.4.1"
 maybe-async = "0.2.6"
+regex = "1.6.0"
 roux = "2.2.1"
 test-case = "2.2.1"
 tokio = { version = "1.21.1", features = ["full"] }

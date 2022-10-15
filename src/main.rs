@@ -57,17 +57,18 @@
 //! A good client for browsing reddit without the cancer
 
 use {
-	default::default,
+	enum_map::enum_map,
+	regex::Regex,
 	roux::Subreddit,
 	screwit::{
 		self,
-		print_recent_post_comments,
-		Action,
-		Policy,
+		get_post_comments,
+		FilterAction,
+		RegexPolicy,
 		Severity,
-		SubredditFilter,
+		SeverityPolicy,
+		SubredditPolicies,
 	},
-	std::default,
 	tokio,
 };
 
@@ -76,51 +77,58 @@ use {
 async fn main()
 {
 	// Create a policy for actioning on different levels of severity.
-	let mut policy: Policy = default();
-	_ = policy.insert(Severity::Ok, Action::Ignore);
-	_ = policy.insert(Severity::Questionable, Action::Tag);
-	_ = policy.insert(Severity::Awful, Action::Tag);
-	_ = policy.insert(Severity::Scourge, Action::Filter);
+	let policy: SeverityPolicy = enum_map! {
+		Severity::Ok => FilterAction::Ignore,
+		Severity::Questionable => FilterAction::Tag,
+		Severity::Awful => FilterAction::Filter,
+		Severity::Scourge => FilterAction::Report,
+
+	};
 	// Which subreddits to watch out for and how bad each one is considered to be.
-	let subreddit_filter = SubredditFilter::new(
-		&[
-			("conservative".to_string(), Severity::Awful),
-			("conspiracy".to_string(), Severity::Awful),
-			("sino".to_string(), Severity::Scourge),
-			("ConservativeMemes".to_string(), Severity::Awful),
-			("conservatives".to_string(), Severity::Awful),
-			("republican".to_string(), Severity::Awful),
-			("walkaway".to_string(), Severity::Awful),
-			("louderwithcrowder".to_string(), Severity::Awful),
-			("shitpoliticssays".to_string(), Severity::Awful),
-			("progun".to_string(), Severity::Awful),
-			("prolife".to_string(), Severity::Awful),
-			("gunpolitics".to_string(), Severity::Awful),
-			("asktrumpsupporters".to_string(), Severity::Awful),
-			("socialjusticeinaction".to_string(), Severity::Awful),
-			("goldandblack".to_string(), Severity::Awful),
-			("shitstatistssay".to_string(), Severity::Awful),
-			("libertarian".to_string(), Severity::Awful),
-			("libertarianmeme".to_string(), Severity::Awful),
-			("coronaviruscirclejerk".to_string(), Severity::Awful),
-			("anarcho_capitalism".to_string(), Severity::Awful),
-			("firearms".to_string(), Severity::Awful),
-			("nonewnormal".to_string(), Severity::Awful),
-			("theleftcantmeme".to_string(), Severity::Awful),
-			("jordanpeterson".to_string(), Severity::Awful),
-			("lockdownskepticism".to_string(), Severity::Awful),
-			("centrist".to_string(), Severity::Awful),
-			("actualpublicfreakouts".to_string(), Severity::Awful),
-			("protectandserve".to_string(), Severity::Awful),
-			("kotakuinaction".to_string(), Severity::Awful),
-			("moderatepolitics".to_string(), Severity::Awful),
-			("conspiracy_commons".to_string(), Severity::Awful),
-			("trueunpopularopinion".to_string(), Severity::Awful),
-			("joerogan".to_string(), Severity::Awful),
-			("mensrights".to_string(), Severity::Awful),
-			("memes".to_string(), Severity::Ok),
-		],
-		policy,
-	);
-	print_recent_post_comments(&Subreddit::new("gaming"), &subreddit_filter).await;
+	#[rustfmt::skip]
+	let subreddit_filter: SubredditPolicies = vec!
+		[
+			RegexPolicy { regex: Regex::new(          "conservative").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(            "conspiracy").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(                  "sino").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(     "ConservativeMemes").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(         "conservatives").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(            "republican").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(              "walkaway").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(     "louderwithcrowder").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(      "shitpoliticssays").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(                "progun").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(               "prolife").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(           "gunpolitics").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(    "asktrumpsupporters").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new( "socialjusticeinaction").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(          "goldandblack").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(       "shitstatistssay").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(           "libertarian").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(       "libertarianmeme").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new( "coronaviruscirclejerk").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(    "anarcho_capitalism").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(              "firearms").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(           "nonewnormal").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(       "theleftcantmeme").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(        "jordanpeterson").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(    "lockdownskepticism").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(              "centrist").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new( "actualpublicfreakouts").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(       "protectandserve").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(        "kotakuinaction").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(      "moderatepolitics").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(    "conspiracy_commons").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(  "trueunpopularopinion").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(              "joerogan").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(            "mensrights").expect(""), severity: Severity::Awful },
+			RegexPolicy { regex: Regex::new(                 "memes").expect(""), severity: Severity::Ok },
+		];
+	let subreddit = Subreddit::new("gaming");
+	let new = subreddit.hot(1, None).await;
+	let article_id = &new.unwrap().data.children.first().unwrap().data.id.clone();
+	if let Ok(comments) = get_post_comments(&subreddit, article_id, &subreddit_filter, &policy).await
+	{
+		println!("{}", comments);
+	}
 }

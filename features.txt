@@ -1,9 +1,54 @@
-autocorrect other people's comments
+autocorrect other people's comments and post titles
+	for each comment or post title, run it through an autocorrect function.
+	instead of showing the original comment or post title, show the resulting string autocorrect generates.
+	a button is displayed next to the string toggles showing the original comment or post title when clicked.
+
 delete all subreddit only comments
-show post content
+	if a comment matches regex "^r/.*$", don't show that comment or its children.
+	possibly show it in a seperate panel instead. the panel could be a popout on the post or comment the subreddit tag was in response to.
+
 browse subreddit
-tag usernames with the bad subreddits they belong to, or remove them entirely
+	show posts
+
+show post
+	show post content and comments
+
+show username
+	tag usernames with the bad subreddits they participate in, or remove them entirely, according to the filter rule
+
+autocrop posts
+remove or partial blur/trim tiktok posts
+
+
+subreddit:
+browse subreddit with commands
+	browse <subreddit> [sortMode]
+	subscribe <subreddit>
+	filter <subreddit>
+interact with subreddit with commands
+
+comments:
+open comments with commands
+	comments <postId>
+	
+interact with comments with commands
 
 user settings:
-hide comments from users that participate in bad subreddits { All, CommentPolicy(SubredditPolicy(string subreddit, FilterAction filterAction)) }
-hide posts from users that participate in bad subreddits
+read settings from file
+edit settings with commands
+planned settings:
+	ContentFilters: Vec<impl ContentFilter> // hide comments from users that participate in bad subreddits
+
+enum Severity       // how bad a piece of content is
+enum FilterAction   // what to do with a piece of content
+
+type ContentFilter<const SIZE> [(Severity, FilterAction); SIZE]    // user specified Severity to FilterAction
+
+struct RegexPolicy(regex: Regex, severity: Severity)    // user specified Regex to Severity
+
+type SubredditPolicies = Vec<RegexPolicy>      // filter subreddits with a regex
+type CommentPolicies   = Vec<RegexPolicy>      // filter comments with a regex
+type TextPostPolicies  = Vec<RegexPolicy>      // filter text posts with a regex
+type ImagePostPolicies = Vec<>      // filter image posts
+type LinkPostPolicies  = Vec<RegexPolicy>      // filter link posts with a regex
+type UsernamePolicies  = Vec<RegexPolicy>      // filter usernames with a regex

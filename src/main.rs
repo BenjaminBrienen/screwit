@@ -11,7 +11,7 @@
 #![warn(missing_abi)]
 #![warn(missing_copy_implementations)]
 #![warn(missing_debug_implementations)]
-#![warn(missing_docs)]
+//#![warn(missing_docs)]
 #![warn(must_not_suspend)]
 #![warn(non_ascii_idents)]
 #![warn(non_exhaustive_omitted_patterns)]
@@ -52,17 +52,31 @@
 #![feature(custom_test_frameworks)]
 #![feature(default_free_fn)]
 #![feature(anonymous_lifetime_in_impl_trait)]
-#![feature(is_some_with)]
 #![feature(unboxed_closures)]
 //! A good client for browsing reddit without the cancer
 
+pub mod browse;
+pub mod command;
+pub mod comment;
+pub mod post;
+pub mod settings;
+pub mod subreddit;
+#[cfg(test)]
+mod tests;
+pub mod user;
+
 use {
+	crate::{
+		browse::*,
+		command::*,
+		settings::*,
+	},
+	clap::Parser,
 	enum_map::enum_map,
 	regex::Regex,
 	roux::Subreddit,
 	screwit::{
 		self,
-		get_post_comments,
 		FilterAction,
 		RegexPolicy,
 		Severity,
@@ -75,6 +89,19 @@ use {
 /// .
 #[tokio::main]
 async fn main()
+{
+	let args = command::Cli::parse();
+	// println!("{:?}", args);
+	match args.command
+	{
+		Command::Browse { object } => browse(object),
+		Command::Setting { object } => setting(object),
+		Command::Test { value } => println!("{:?}", value),
+		Command::Example => example_filter().await,
+	}
+}
+
+async fn example_filter()
 {
 	// Create a policy for actioning on different levels of severity.
 	let policy: SeverityPolicy = enum_map! {
@@ -127,7 +154,7 @@ async fn main()
 	let subreddit = Subreddit::new("gaming");
 	let new = subreddit.hot(1, None).await;
 	let article_id = &new.unwrap().data.children.first().unwrap().data.id.clone();
-	if let Ok(comments) = get_post_comments(&subreddit, article_id, &subreddit_filter, &policy).await
+	if let Ok(comments) = crate::post::get_post_comments(&subreddit, article_id, &subreddit_filter, &policy).await
 	{
 		println!("{}", comments);
 	}

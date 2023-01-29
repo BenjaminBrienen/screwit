@@ -26,7 +26,7 @@ pub enum Command
 		#[command(subcommand)]
 		object: SettingCommand,
 	},
-	Example,
+	Example {},
 }
 
 #[derive(Parser, Debug)]

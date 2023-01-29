@@ -1,5 +1,5 @@
 use {
-	crate::user::get_user_participated_subreddits_and_subreddit_karmas,
+	crate::command::browse::user::get_user_participated_subreddits_and_subreddit_karmas,
 	roux::User,
 };
 

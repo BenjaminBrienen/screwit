@@ -1,5 +1,5 @@
 use {
-	crate::comment::iterate_replies,
+	crate::command::browse::comment::iterate_replies,
 	roux::{
 		comment::CommentData,
 		response::BasicThing,

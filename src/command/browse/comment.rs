@@ -1,8 +1,4 @@
 use {
-	crate::user::{
-		filter_subreddits_above_karma_threshhold,
-		get_user_participated_subreddits_and_subreddit_karmas,
-	},
 	async_recursion::async_recursion,
 	roux::{
 		comment::CommentData,
@@ -17,6 +13,10 @@ use {
 		SubredditPolicies,
 	},
 	std::default::default,
+	crate::command::browse::user::{
+		filter_subreddits_above_karma_threshhold,
+		get_user_participated_subreddits_and_subreddit_karmas,
+	},
 };
 
 #[async_recursion]

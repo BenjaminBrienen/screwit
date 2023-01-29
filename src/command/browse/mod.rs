@@ -1,19 +1,21 @@
+pub mod comment;
+pub mod submission;
+pub mod subreddit;
+pub mod user;
+
 use {
-	clap::{
-		Subcommand,
-		ValueEnum,
-	},
+	clap::Subcommand,
 	roux::{
 		comment::CommentData,
 		submission::SubmissionData,
 		subreddit::response::SubredditData,
-		util::{
-			FeedOption,
-			RouxError,
-		},
+		util::FeedOption,
 		Submissions,
-		Subreddit,
 		User,
+	},
+	subreddit::{
+		BrowseSubreddit,
+		SubredditSection,
 	},
 };
 
@@ -38,26 +40,6 @@ pub enum BrowseCommand
 	{
 		user_name: String
 	},
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Subcommand)]
-pub enum SubredditSection
-{
-	About,
-	Submissions
-	{
-		sort:  SortMode,
-		limit: u32,
-	},
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum)]
-pub enum SortMode
-{
-	New,
-	Hot,
-	Top,
-	Rising,
 }
 
 pub enum BrowseResponse
@@ -106,7 +88,7 @@ pub async fn browse(
 		} =>
 		{
 			BrowseResponse::Subreddit(SubredditResponse::About(
-				browse_subreddit_about(subreddit_name)
+				BrowseSubreddit::about(subreddit_name)
 					.await
 					.expect("Failed to browse subreddit."),
 			))
@@ -117,7 +99,7 @@ pub async fn browse(
 		} =>
 		{
 			BrowseResponse::Subreddit(SubredditResponse::Submissions(
-				browse_subreddit_submissions(subreddit_name, sort, limit, options)
+				BrowseSubreddit::submissions(subreddit_name, sort, limit, options)
 					.await
 					.expect("Failed to browse subreddit."),
 			))
@@ -125,30 +107,6 @@ pub async fn browse(
 		BrowseCommand::Submission { submission_id: post_id } => BrowseResponse::Submission(browse_submission(post_id)),
 		BrowseCommand::Comment { comment_id } => BrowseResponse::Comment(browse_comment(comment_id)),
 		BrowseCommand::User { user_name } => BrowseResponse::User(browse_user(user_name)),
-	}
-}
-
-async fn browse_subreddit_about(subreddit_name: String) -> Result<SubredditData, RouxError>
-{
-	println!("Browsing subreddit: {}", subreddit_name);
-	roux::Subreddit::new(subreddit_name.as_str()).about().await
-}
-
-async fn browse_subreddit_submissions(
-	subreddit_name: String,
-	sort: SortMode,
-	limit: u32,
-	options: Option<FeedOption>,
-) -> Result<Submissions, RouxError>
-{
-	println!("Browsing subreddit: {}", subreddit_name);
-	let subreddit = Subreddit::new(subreddit_name.as_str());
-	match sort
-	{
-		SortMode::New => subreddit.latest(limit, options).await,
-		SortMode::Hot => subreddit.hot(limit, options).await,
-		SortMode::Top => subreddit.top(limit, options).await,
-		SortMode::Rising => subreddit.rising(limit, options).await,
 	}
 }
 

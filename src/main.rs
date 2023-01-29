@@ -21,34 +21,24 @@
 #![feature(lint_reasons)]
 //! A good client for browsing reddit without the cancer
 
-use std::error::Error;
+use {
+	crate::command::{
+		browse::browse,
+		settings::setting,
+	},
+	command::browse::submission::get_post_comments,
+	std::error::Error,
+};
 
-/// Handles browse subcommand
-pub mod browse;
 /// Handles CLI commands
 pub mod command;
-/// Handles comments
-pub mod comment;
-/// Handles posts
-pub mod post;
-/// Handles settings
-pub mod settings;
-/// Handles subreddits
-pub mod subreddit;
 #[cfg(test)]
 mod tests;
-/// Handles users
-pub mod user;
 
 use {
-	crate::{
-		browse::*,
-		command::*,
-		settings::*,
-	},
+	crate::command::*,
 	clap::Parser,
 	enum_map::enum_map,
-	post::get_post_comments,
 	regex::Regex,
 	roux::Subreddit,
 	screwit::{

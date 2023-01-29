@@ -1,3 +1,6 @@
+pub mod browse;
+pub mod settings;
+
 use {
 	crate::{
 		browse::{

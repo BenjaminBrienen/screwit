@@ -1,7 +1,13 @@
 use {
 	crate::{
-		browse::BrowseCommand,
-		settings::SettingCommand,
+		browse::{
+			BrowseCommand,
+			BrowseResponse,
+		},
+		settings::{
+			SettingCommand,
+			SettingResponse,
+		},
 	},
 	clap::{
 		Parser,
@@ -12,10 +18,6 @@ use {
 #[derive(Debug, Clone, PartialEq, Eq, Ord, PartialOrd, Subcommand)]
 pub enum Command
 {
-	Test
-	{
-		value: u32,
-	},
 	Browse
 	{
 		#[command(subcommand)]
@@ -27,6 +29,14 @@ pub enum Command
 		object: SettingCommand,
 	},
 	Example {},
+}
+
+#[derive(Debug)]
+pub enum Response
+{
+	Browse(BrowseResponse),
+	Setting(SettingResponse),
+	Example(String),
 }
 
 #[derive(Parser, Debug)]
